@@ -984,7 +984,7 @@
     const mode = syncData.storageMode || "sync";
     if (mode === "sync") {
       return syncData.geminiApiKey;
-    } else if (mode === "encrypted" || mode === "session") {
+    } else if (mode === "encrypted") {
       const sessionData = await chrome.storage.session.get(["sessionApiKey"]);
       return sessionData.sessionApiKey;
     }

@@ -30,8 +30,8 @@ async function getApiKey() {
 
     if (mode === "sync") {
         return syncData.geminiApiKey;
-    } else if (mode === "encrypted" || mode === "session") {
-        // Get from session storage
+    } else if (mode === "encrypted") {
+        // Get decrypted key from session storage
         const sessionData = await chrome.storage.session.get(["sessionApiKey"]);
         return sessionData.sessionApiKey;
     }
@@ -44,7 +44,7 @@ async function handleGeminiRequest(apiKey, question) {
         // Initialize the Google Generative AI client
         const genAI = new GoogleGenerativeAI(apiKey);
 
-        // Get the model - using gemini-1.5-flash for good balance of speed and capability
+        // Get the model - using gemini-2.5-flash-lite for speed and efficiency
         const model = genAI.getGenerativeModel({
             model: "gemini-2.5-flash-lite",
             systemInstruction: `You are a concise answer assistant. Follow these rules strictly:

@@ -1,6 +1,6 @@
 {
     "name": "ask-gemini",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "description": "Chrome extension to quickly find out what highlighted text means using Gemini AI",
     "author": "kmab5",
     "license": "MIT",

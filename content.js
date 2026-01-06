@@ -332,6 +332,4 @@
             hideTooltip();
         }
     });
-
-    console.log("Ask Gemini: Content script initialized");
 })();

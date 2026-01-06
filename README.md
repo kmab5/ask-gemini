@@ -1,6 +1,6 @@
 # Ask Gemini - Chrome Extension
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://github.com/kmab5/ask-gemini)
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/kmab5/ask-gemini)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/author-kmab5-orange.svg)](https://github.com/kmab5)
 
@@ -146,9 +146,10 @@ The selected text triggered Gemini's safety filters. Try selecting different tex
 
 ## Privacy
 
-- Your API key is stored locally in Chrome's sync storage
+- Your API key is stored locally in Chrome's sync storage (or encrypted with AES-256-GCM if password protection is enabled)
 - Selected text is sent directly to Google's Gemini API
 - No data is collected or stored by this extension beyond your settings
+- See our [Privacy Policy](https://kmab5.github.io/ask-gemini/#privacy) for more details
 
 ## License
 
@@ -169,6 +170,22 @@ Contributions are welcome! Feel free to:
 Issues and PRs can be submitted at [github.com/kmab5/ask-gemini](https://github.com/kmab5/ask-gemini)
 
 ## Changelog
+
+### v1.1.1
+
+- Code cleanup and optimizations
+- Removed unused session-only storage mode
+- Updated model comments for accuracy
+- Minor bug fixes
+
+### v1.1.0
+
+- Added password-protected API key storage (AES-256-GCM encryption)
+- New unlock/clear UI for encrypted storage mode
+- Overhauled landing page with modern design
+- Custom scrollbar styling in popup
+- Improved error messages for encrypted mode
+- Fixed session storage access in content scripts
 
 ### v1.0.1
 
