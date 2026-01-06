@@ -821,6 +821,112 @@
                 font-size: 3rem;
             }
 
+            /* Getting Started Section */
+            .getting-started {
+                padding: 8rem 2rem;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+
+            .guide-steps {
+                margin-top: 3rem;
+            }
+
+            .guide-step {
+                display: flex;
+                gap: 1.5rem;
+                padding: 1.5rem 0;
+                position: relative;
+            }
+
+            .guide-step:not(:last-child)::after {
+                content: "";
+                position: absolute;
+                left: 19px;
+                top: 60px;
+                bottom: 0;
+                width: 2px;
+                background: linear-gradient(
+                    180deg,
+                    var(--accent-green),
+                    transparent
+                );
+            }
+
+            .guide-step-number {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                font-weight: 700;
+                background: var(--bg-card);
+                border: 2px solid var(--accent-green);
+                border-radius: 50%;
+                color: var(--accent-green);
+                flex-shrink: 0;
+                position: relative;
+                z-index: 1;
+            }
+
+            .guide-step-content h3 {
+                font-size: 1.1rem;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+            }
+
+            .guide-step-content p {
+                color: var(--text-secondary);
+                line-height: 1.7;
+            }
+
+            .guide-step-content a {
+                color: var(--accent-blue);
+                text-decoration: none;
+            }
+
+            .guide-step-content a:hover {
+                text-decoration: underline;
+            }
+
+            .guide-tips {
+                margin-top: 3rem;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 16px;
+                padding: 2rem;
+            }
+
+            .guide-tips h3 {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+
+            .guide-tips ul {
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .guide-tips li {
+                color: var(--text-secondary);
+                padding-left: 1.5rem;
+                position: relative;
+            }
+
+            .guide-tips li::before {
+                content: "→";
+                position: absolute;
+                left: 0;
+                color: var(--accent-green);
+            }
+
+            .guide-tips li strong {
+                color: var(--text-primary);
+            }
+
             /* Security Section */
             .security {
                 padding: 8rem 2rem;
@@ -1215,6 +1321,7 @@
                 <div class="nav-links">
                     <a href="#features">Features</a>
                     <a href="#how-it-works">How It Works</a>
+                    <a href="#getting-started">Get Started</a>
                     <a href="#security">Security</a>
                     <a href="#privacy">Privacy</a>
                     <a
@@ -1472,6 +1579,97 @@
                         </div>
                         <div class="step-visual">✨</div>
                     </div>
+                </div>
+            </section>
+
+            <!-- Getting Started Section -->
+            <section class="getting-started" id="getting-started">
+                <div class="section-header">
+                    <span class="section-label">New Users</span>
+                    <h2 class="section-title">Getting Started Guide</h2>
+                    <p class="section-subtitle">
+                        Set up Ask Gemini in under 2 minutes.
+                    </p>
+                </div>
+
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-content">
+                            <h3>Get a Free API Key</h3>
+                            <p>
+                                Visit
+                                <a
+                                    href="https://aistudio.google.com/apikey"
+                                    target="_blank"
+                                    rel="noopener"
+                                    >Google AI Studio</a
+                                >
+                                and sign in with your Google account. Click
+                                "Create API Key" — it's completely free!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-content">
+                            <h3>Install the Extension</h3>
+                            <p>
+                                Add Ask Gemini to Chrome from the
+                                <a href="#" target="_blank" rel="noopener"
+                                    >Chrome Web Store</a
+                                >. Click the extension icon in your toolbar to
+                                open settings.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-content">
+                            <h3>Paste Your API Key</h3>
+                            <p>
+                                Copy your API key from Google AI Studio and
+                                paste it into the extension settings. Choose
+                                "Simple Storage" for easy access, or "Password
+                                Protected" for extra security.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="guide-step-number">4</div>
+                        <div class="guide-step-content">
+                            <h3>Start Using It!</h3>
+                            <p>
+                                Highlight any text on any webpage. A small
+                                Gemini button will appear — click it to get an
+                                instant AI explanation. That's it!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-tips">
+                    <h3>💡 Pro Tips</h3>
+                    <ul>
+                        <li>
+                            <strong>Customize your questions:</strong> Change
+                            the question template in settings to ask for
+                            translations, summaries, or code explanations.
+                        </li>
+                        <li>
+                            <strong>Switch models:</strong> If you hit rate
+                            limits, try a different Gemini model from the
+                            dropdown. Flash Lite is fastest!
+                        </li>
+                        <li>
+                            <strong>Refresh models:</strong> Click the ↻ button
+                            next to the model selector to fetch the latest
+                            available models.
+                        </li>
+                    </ul>
                 </div>
             </section>
 
@@ -1752,6 +1950,7 @@
                     <div class="footer-links">
                         <h4>Product</h4>
                         <a href="#features">Features</a>
+                        <a href="#getting-started">Getting Started</a>
                         <a href="#how-it-works">How It Works</a>
                         <a href="#security">Security</a>
                         <a href="https://github.com/kmab5/ask-gemini/releases"

@@ -3,18 +3,120 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// Default model
+const DEFAULT_MODEL = "gemini-2.5-flash-lite";
+
+// Curated list of major Gemini models (static to avoid API rate limits)
+const AVAILABLE_MODELS = [
+    {
+        id: "gemini-latest-pro",
+        name: "Gemini Pro Latest",
+        description: "Latest pro model",
+    },
+    {
+        id: "gemini-3-flash-preview",
+        name: "Gemini 3 Flash",
+        description: "Most balanced model, designed to scale",
+    },
+    {
+        id: "gemini-2.5-flash-lite",
+        name: "Gemini 2.5 Flash Lite",
+        description: "Latest, fastest and most efficient",
+    },
+    {
+        id: "gemini-3-pro-preview",
+        name: "Gemini 3 Pro",
+        description: "Most intelligent model",
+    },
+    {
+        id: "gemini-3-flash-preview",
+        name: "Gemini 3 Flash",
+        description: "Most balanced model, designed to scale",
+    },
+    {
+        id: "gemini-2.5-flash-lite",
+        name: "Gemini 2.5 Flash Lite",
+        description: "Latest, fastest and most efficient",
+    },
+    {
+        id: "gemini-2.5-flash",
+        name: "Gemini 2.5 Flash",
+        description: "Latest fast model",
+    },
+    {
+        id: "gemini-2.5-pro",
+        name: "Gemini 2.5 Pro",
+        description: "Latest, most capable",
+    },
+    {
+        id: "gemini-2.0-flash-lite",
+        name: "Gemini 2.0 Flash Lite",
+        description: "Fast and efficient",
+    },
+    {
+        id: "gemini-2.0-flash",
+        name: "Gemini 2.0 Flash",
+        description: "Fast and capable",
+    },
+    {
+        id: "gemma-3-27b-it",
+        name: "Gemma 3 27B",
+        description: "Most capable open model",
+    },
+    {
+        id: "gemma-3-12b-it",
+        name: "Gemma 3 12B",
+        description: "Balanced open model",
+    },
+    {
+        id: "gemma-3-4b-it",
+        name: "Gemma 3 4B",
+        description: "Fast open model",
+    },
+    {
+        id: "gemma-3-1b-it",
+        name: "Gemma 3 1B",
+        description: "Ultra-light open model",
+    },
+];
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "askGemini") {
-        handleGeminiRequest(request.apiKey, request.question)
+        handleGeminiRequest(request.apiKey, request.question, request.model)
             .then(sendResponse)
             .catch((error) => sendResponse({ error: error.message }));
-        return true; // Keep message channel open for async response
+        return true;
     }
 
     if (request.action === "getApiKey") {
         getApiKey()
             .then((apiKey) => sendResponse({ apiKey }))
             .catch((error) => sendResponse({ error: error.message }));
+        return true;
+    }
+
+    if (request.action === "getModels") {
+        // Check cache first, then fall back to static list
+        getModels()
+            .then((models) => sendResponse({ models }))
+            .catch(() => sendResponse({ models: AVAILABLE_MODELS }));
+        return true;
+    }
+
+    if (request.action === "refreshModels") {
+        // Fetch fresh models from API and cache them
+        fetchAndCacheModels(request.apiKey)
+            .then((models) => sendResponse({ models, fromApi: true }))
+            .catch((error) =>
+                sendResponse({ models: AVAILABLE_MODELS, error: error.message })
+            );
+        return true;
+    }
+
+    if (request.action === "getSelectedModel") {
+        chrome.storage.sync.get(["selectedModel"], (result) => {
+            sendResponse({ model: result.selectedModel || DEFAULT_MODEL });
+        });
         return true;
     }
 });
@@ -39,14 +141,115 @@ async function getApiKey() {
     return null;
 }
 
-async function handleGeminiRequest(apiKey, question) {
+// Get models from cache or return static list
+async function getModels() {
+    try {
+        const data = await chrome.storage.local.get(["cachedModels"]);
+        if (data.cachedModels && data.cachedModels.length > 0) {
+            return data.cachedModels;
+        }
+    } catch (error) {
+        console.error("Error reading cached models:", error);
+    }
+    return AVAILABLE_MODELS;
+}
+
+// Fetch models from API and cache them
+async function fetchAndCacheModels(apiKey) {
+    if (!apiKey) {
+        throw new Error("API key required to fetch models");
+    }
+
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to fetch models");
+    }
+
+    const data = await response.json();
+
+    // Filter for major generative models
+    const models = data.models
+        .filter((model) => {
+            const name = model.name.toLowerCase();
+            const id = model.name.replace("models/", "");
+            // Only include major gemini/gemma models that support generateContent
+            return (
+                ((name.includes("gemini") || name.includes("gemma")) &&
+                    model.supportedGenerationMethods?.includes(
+                        "generateContent"
+                    ) &&
+                    !name.includes("vision") &&
+                    !name.includes("embedding") &&
+                    !name.includes("aqa") &&
+                    !name.includes("thinking") &&
+                    !id.includes("-")) ||
+                /^gemini-[0-9]/.test(id) || // Major versioned models like gemini-2.0-flash
+                /^gemma-[0-9]/.test(id) // Gemma models like gemma-3-27b-it
+            );
+        })
+        .map((model) => {
+            const id = model.name.replace("models/", "");
+            return {
+                id: id,
+                name: formatModelName(id),
+                description: model.description || "",
+            };
+        })
+        .filter(
+            (model, index, self) =>
+                // Remove duplicates by id
+                index === self.findIndex((m) => m.id === model.id)
+        )
+        .sort((a, b) => {
+            // Sort by version (newer first)
+            const aVersion = extractVersion(a.id);
+            const bVersion = extractVersion(b.id);
+            if (bVersion !== aVersion) return bVersion - aVersion;
+            // Then by type: lite < flash < pro
+            if (a.id.includes("lite") && !b.id.includes("lite")) return -1;
+            if (!a.id.includes("lite") && b.id.includes("lite")) return 1;
+            if (a.id.includes("flash") && b.id.includes("pro")) return -1;
+            if (a.id.includes("pro") && b.id.includes("flash")) return 1;
+            return 0;
+        });
+
+    // Cache the models in local storage
+    if (models.length > 0) {
+        await chrome.storage.local.set({ cachedModels: models });
+        return models;
+    }
+
+    return AVAILABLE_MODELS;
+}
+
+// Format model name for display
+function formatModelName(modelId) {
+    return modelId
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
+
+// Extract version number from model ID
+function extractVersion(modelId) {
+    const match = modelId.match(/(\d+\.?\d*)/);
+    return match ? parseFloat(match[1]) : 0;
+}
+
+async function handleGeminiRequest(apiKey, question, modelId) {
     try {
         // Initialize the Google Generative AI client
         const genAI = new GoogleGenerativeAI(apiKey);
 
-        // Get the model - using gemini-2.5-flash-lite for speed and efficiency
+        // Get the selected model or use default
+        const selectedModel = modelId || DEFAULT_MODEL;
+
+        // Get the model
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash-lite",
+            model: selectedModel,
             systemInstruction: `You are a concise answer assistant. Follow these rules strictly:
 1. Answer only the question asked
 2. No embellishments or extra commentary
@@ -96,7 +299,7 @@ async function handleGeminiRequest(apiKey, question) {
             error.message?.includes("429")
         ) {
             throw new Error(
-                "Rate limit exceeded. Please try again in a moment."
+                "Rate limit exceeded. Try a different model in settings or wait a moment."
             );
         } else if (error.message?.includes("SAFETY")) {
             throw new Error("Content was blocked by safety filters.");

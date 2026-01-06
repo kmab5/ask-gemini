@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const apiKeyInput = document.getElementById("apiKey");
     const questionTemplateInput = document.getElementById("questionTemplate");
+    const modelSelect = document.getElementById("modelSelect");
+    const modelLoading = document.getElementById("modelLoading");
+    const modelInfo = document.getElementById("modelInfo");
+    const refreshModelsBtn = document.getElementById("refreshModelsBtn");
     const saveBtn = document.getElementById("saveBtn");
     const statusEl = document.getElementById("status");
     const passwordField = document.getElementById("passwordField");
@@ -22,6 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Track current state
     let hasEncryptedKey = false;
     let isUnlocked = false;
+    let availableModels = [];
+    let currentApiKey = null;
 
     // Update UI when storage option changes
     storageOptions.forEach((option) => {
@@ -65,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     "questionTemplate",
                     "storageMode",
                     "encryptedApiKey",
+                    "selectedModel",
                 ],
                 resolve
             );
@@ -93,13 +100,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Load API key based on mode
         if (mode === "sync" && syncData.geminiApiKey) {
             apiKeyInput.value = syncData.geminiApiKey;
+            currentApiKey = syncData.geminiApiKey;
         } else if (mode === "encrypted") {
             if (isUnlocked) {
-                // Already unlocked this session
                 apiKeyInput.value = sessionData.sessionApiKey;
                 apiKeyInput.placeholder = "API key (unlocked for this session)";
+                currentApiKey = sessionData.sessionApiKey;
             } else if (hasEncryptedKey) {
-                // Has encrypted key, needs unlock
                 apiKeyInput.value = "";
                 apiKeyInput.placeholder = "Unlock to view/edit API key";
             }
@@ -111,7 +118,139 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             questionTemplateInput.value = "What is {highlightedtext}?";
         }
+
+        // Load models after we have the API key
+        await loadModels(currentApiKey, syncData.selectedModel);
     }
+
+    // Fetch and populate available models
+    async function loadModels(apiKey, savedModel) {
+        modelLoading.style.display = "flex";
+        modelInfo.style.display = "none";
+
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: "getModels",
+                apiKey: apiKey,
+            });
+
+            availableModels = response.models || [];
+
+            // Clear and populate select
+            modelSelect.innerHTML = "";
+
+            if (availableModels.length === 0) {
+                modelSelect.innerHTML =
+                    '<option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>';
+            } else {
+                availableModels.forEach((model) => {
+                    const option = document.createElement("option");
+                    option.value = model.id;
+                    option.textContent = model.name;
+                    if (model.description) {
+                        option.title = model.description;
+                    }
+                    modelSelect.appendChild(option);
+                });
+            }
+
+            // Set saved model or default
+            const defaultModel = savedModel || "gemini-2.5-flash-lite";
+            if (modelSelect.querySelector(`option[value="${defaultModel}"]`)) {
+                modelSelect.value = defaultModel;
+            }
+
+            modelInfo.textContent = `${availableModels.length} models available`;
+            modelInfo.style.display = "block";
+        } catch (error) {
+            console.error("Error loading models:", error);
+            modelSelect.innerHTML =
+                '<option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (default)</option>';
+            modelInfo.textContent = "Using default model";
+            modelInfo.style.display = "block";
+        } finally {
+            modelLoading.style.display = "none";
+            refreshModelsBtn.disabled = false;
+            refreshModelsBtn.classList.remove("spinning");
+        }
+    }
+
+    // Reload models when API key changes
+    apiKeyInput.addEventListener("blur", async () => {
+        const newApiKey = apiKeyInput.value.trim();
+        if (newApiKey && newApiKey !== currentApiKey) {
+            currentApiKey = newApiKey;
+            const syncData = await new Promise((resolve) => {
+                chrome.storage.sync.get(["selectedModel"], resolve);
+            });
+            await loadModels(newApiKey, syncData.selectedModel);
+        }
+    });
+
+    // Refresh models from API button
+    refreshModelsBtn.addEventListener("click", async () => {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            modelInfo.textContent = "Enter API key first to refresh models";
+            modelInfo.style.display = "block";
+            return;
+        }
+
+        refreshModelsBtn.disabled = true;
+        refreshModelsBtn.classList.add("spinning");
+        modelLoading.style.display = "flex";
+        modelInfo.style.display = "none";
+
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: "refreshModels",
+                apiKey: apiKey,
+            });
+
+            availableModels = response.models || [];
+            const currentValue = modelSelect.value;
+
+            // Clear and populate select
+            modelSelect.innerHTML = "";
+
+            if (availableModels.length === 0) {
+                modelSelect.innerHTML =
+                    '<option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</option>';
+            } else {
+                availableModels.forEach((model) => {
+                    const option = document.createElement("option");
+                    option.value = model.id;
+                    option.textContent = model.name;
+                    if (model.description) {
+                        option.title = model.description;
+                    }
+                    modelSelect.appendChild(option);
+                });
+            }
+
+            // Restore previous selection if available
+            if (modelSelect.querySelector(`option[value="${currentValue}"]`)) {
+                modelSelect.value = currentValue;
+            }
+
+            if (response.fromApi) {
+                modelInfo.textContent = `${availableModels.length} models loaded from API`;
+            } else {
+                modelInfo.textContent = response.error
+                    ? `Using cached list: ${response.error}`
+                    : `${availableModels.length} models available`;
+            }
+            modelInfo.style.display = "block";
+        } catch (error) {
+            console.error("Error refreshing models:", error);
+            modelInfo.textContent = "Failed to refresh models";
+            modelInfo.style.display = "block";
+        } finally {
+            modelLoading.style.display = "none";
+            refreshModelsBtn.disabled = false;
+            refreshModelsBtn.classList.remove("spinning");
+        }
+    });
 
     loadSettings();
 
@@ -195,6 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
             'input[name="storageMode"]:checked'
         ).value;
         const encryptionPassword = encryptionPasswordInput.value;
+        const selectedModel = modelSelect.value;
 
         if (!apiKey) {
             showStatus("Please enter your API key", "error");
@@ -223,6 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     questionTemplate: questionTemplate,
                     storageMode: "sync",
                     encryptedApiKey: null,
+                    selectedModel: selectedModel,
                 });
                 await chrome.storage.session.set({ sessionApiKey: null });
                 showStatus("Settings saved!", "success");
@@ -233,6 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     await chrome.storage.session.set({ sessionApiKey: apiKey });
                     await chrome.storage.sync.set({
                         questionTemplate: questionTemplate,
+                        selectedModel: selectedModel,
                     });
                     showStatus("Settings updated!", "success");
                 } else {
@@ -246,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         encryptedApiKey: encryptedKey,
                         questionTemplate: questionTemplate,
                         storageMode: "encrypted",
+                        selectedModel: selectedModel,
                     });
                     // Store decrypted key in session for immediate use
                     await chrome.storage.session.set({ sessionApiKey: apiKey });

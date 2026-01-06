@@ -53,7 +53,7 @@
         tooltipContainer.innerHTML = `
             <div class="ask-gemini-header">
                 <img src="${iconUrl}" alt="Gemini" style="width: 16px; height: 16px;">
-                <span>Ask Gemini</span>
+                <span class="ask-gemini-title">Ask Gemini</span>
                 <button class="ask-gemini-close" title="Close">×</button>
             </div>
             <div class="ask-gemini-content">
@@ -205,7 +205,7 @@
             // Get settings
             const settings = await new Promise((resolve) => {
                 chrome.storage.sync.get(
-                    ["questionTemplate", "storageMode"],
+                    ["questionTemplate", "storageMode", "selectedModel"],
                     resolve
                 );
             });
@@ -217,6 +217,8 @@
 
             const apiKey = apiKeyResponse?.apiKey;
             const mode = settings.storageMode || "sync";
+            const selectedModel =
+                settings.selectedModel || "gemini-2.5-flash-lite";
 
             if (!apiKey) {
                 const message =
@@ -237,11 +239,12 @@
                 settings.questionTemplate || "What is {highlightedtext}?";
             const question = template.replace("{highlightedtext}", text);
 
-            // Send message to background script
+            // Send message to background script with selected model
             const response = await chrome.runtime.sendMessage({
                 action: "askGemini",
                 apiKey: apiKey,
                 question: question,
+                modelId: selectedModel,
             });
 
             if (response && response.error) {
@@ -251,6 +254,15 @@
                     </div>
                 `;
             } else if (response && response.answer) {
+                // Update header with model name
+                const titleEl =
+                    tooltipContainer.querySelector(".ask-gemini-title");
+                if (titleEl) {
+                    const modelName = formatModelName(selectedModel);
+                    titleEl.innerHTML = `Ask Gemini <span class="ask-gemini-model">${escapeHtml(
+                        modelName
+                    )}</span>`;
+                }
                 contentEl.innerHTML = `
                     <div class="ask-gemini-answer">
                         ${escapeHtml(response.answer)}
@@ -278,6 +290,14 @@
         const div = document.createElement("div");
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    // Format model ID for display
+    function formatModelName(modelId) {
+        return modelId
+            .split("-")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
     }
 
     // Event listeners
