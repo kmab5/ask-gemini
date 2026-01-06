@@ -11,6 +11,26 @@
                 padding: 0;
             }
 
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #4285f4, #34a853);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: linear-gradient(180deg, #5a9bf5, #4aba6a);
+            }
+
             body {
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
                 width: 350px;
