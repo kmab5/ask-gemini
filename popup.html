@@ -153,6 +153,210 @@
             .api-link:hover {
                 text-decoration: underline;
             }
+
+            .disclaimer {
+                margin-top: 16px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                text-align: center;
+            }
+
+            .disclaimer p {
+                font-size: 10px;
+                color: #6b7280;
+                margin: 0;
+            }
+
+            .disclaimer a {
+                color: #4285f4;
+                text-decoration: none;
+            }
+
+            .disclaimer a:hover {
+                text-decoration: underline;
+            }
+
+            /* Storage options */
+            .storage-options {
+                margin-top: 12px;
+            }
+
+            .storage-options label.section-label {
+                font-size: 12px;
+                color: #b8c1ec;
+                margin-bottom: 10px;
+                display: block;
+            }
+
+            .storage-option {
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 10px;
+                margin-bottom: 8px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .storage-option:hover {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .storage-option.selected {
+                border-color: #4285f4;
+                background: rgba(66, 133, 244, 0.1);
+            }
+
+            .storage-option input[type="radio"] {
+                margin-top: 2px;
+                accent-color: #4285f4;
+            }
+
+            .storage-option-content {
+                flex: 1;
+            }
+
+            .storage-option-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: #fff;
+                margin-bottom: 3px;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .storage-option-title .badge {
+                font-size: 9px;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-weight: 500;
+            }
+
+            .badge-simple {
+                background: rgba(52, 168, 83, 0.2);
+                color: #34a853;
+            }
+
+            .badge-secure {
+                background: rgba(66, 133, 244, 0.2);
+                color: #4285f4;
+            }
+
+            .badge-max {
+                background: rgba(251, 188, 4, 0.2);
+                color: #fbbc04;
+            }
+
+            .storage-option-desc {
+                font-size: 10px;
+                color: #6b7280;
+                line-height: 1.4;
+            }
+
+            .password-field {
+                margin-top: 12px;
+                display: none;
+            }
+
+            .password-field.visible {
+                display: block;
+            }
+
+            .password-field input {
+                width: 100%;
+                padding: 8px 10px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 6px;
+                background: rgba(255, 255, 255, 0.05);
+                color: #fff;
+                font-size: 12px;
+            }
+
+            .password-field input:focus {
+                outline: none;
+                border-color: #4285f4;
+            }
+
+            .password-hint {
+                font-size: 10px;
+                color: #6b7280;
+                margin-top: 4px;
+            }
+
+            /* Unlock section styles */
+            .unlock-desc {
+                font-size: 11px;
+                color: #b8c1ec;
+                margin: 8px 0 12px 0;
+                line-height: 1.4;
+            }
+
+            .unlock-buttons {
+                display: flex;
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .btn-unlock {
+                flex: 1;
+                padding: 10px;
+                background: linear-gradient(90deg, #34a853, #2d9649);
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .btn-unlock:hover {
+                background: linear-gradient(90deg, #2d9649, #34a853);
+                transform: translateY(-1px);
+            }
+
+            .btn-clear {
+                flex: 1;
+                padding: 10px;
+                background: rgba(234, 67, 53, 0.1);
+                color: #ea4335;
+                border: 1px solid rgba(234, 67, 53, 0.3);
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .btn-clear:hover {
+                background: rgba(234, 67, 53, 0.2);
+            }
+
+            .unlock-status {
+                margin-top: 10px;
+                padding: 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                text-align: center;
+                display: none;
+            }
+
+            .unlock-status.success {
+                display: block;
+                background: rgba(52, 168, 83, 0.2);
+                color: #34a853;
+            }
+
+            .unlock-status.error {
+                display: block;
+                background: rgba(234, 67, 53, 0.2);
+                color: #ea4335;
+            }
         </style>
     </head>
     <body>
@@ -162,18 +366,94 @@
         </div>
 
         <div class="form-group">
-            <label for="apiKey">Gemini API Key</label>
-            <input
-                type="password"
-                id="apiKey"
-                placeholder="Enter your Gemini API key" />
-            <a
-                href="https://aistudio.google.com/app/apikey"
-                target="_blank"
-                class="api-link"
-                rel="noopener"
-                >Get your API key from Google AI Studio →</a
-            >
+            <!-- Unlock Section (shown when encrypted key exists but not unlocked) -->
+            <div id="unlockSection" style="display: none">
+                <label>🔐 API Key Protected</label>
+                <p class="unlock-desc">
+                    Your API key is encrypted. Enter your password to unlock it
+                    for this session.
+                </p>
+                <input
+                    type="password"
+                    id="unlockPassword"
+                    placeholder="Enter your password to unlock" />
+                <div class="unlock-buttons">
+                    <button class="btn btn-unlock" id="unlockBtn">
+                        Unlock
+                    </button>
+                    <button class="btn btn-clear" id="clearStorageBtn">
+                        Clear & Reset
+                    </button>
+                </div>
+                <div class="unlock-status" id="unlockStatus"></div>
+            </div>
+
+            <!-- API Key Section (shown for sync mode or after unlock) -->
+            <div id="apiKeySection">
+                <label for="apiKey">Gemini API Key</label>
+                <input
+                    type="password"
+                    id="apiKey"
+                    placeholder="Enter your Gemini API key" />
+                <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    class="api-link"
+                    rel="noopener"
+                    >Get your API key from Google AI Studio →</a
+                >
+            </div>
+
+            <div class="storage-options">
+                <label class="section-label">Storage Method</label>
+
+                <label class="storage-option" id="option-a-label">
+                    <input
+                        type="radio"
+                        name="storageMode"
+                        value="sync"
+                        id="storage-sync"
+                        checked />
+                    <div class="storage-option-content">
+                        <div class="storage-option-title">
+                            Synced Storage
+                            <span class="badge badge-simple">Simple</span>
+                        </div>
+                        <div class="storage-option-desc">
+                            Stored in Chrome sync storage. Syncs across devices.
+                            Standard for extensions.
+                        </div>
+                    </div>
+                </label>
+
+                <label class="storage-option" id="option-b-label">
+                    <input
+                        type="radio"
+                        name="storageMode"
+                        value="encrypted"
+                        id="storage-encrypted" />
+                    <div class="storage-option-content">
+                        <div class="storage-option-title">
+                            Password Protected
+                            <span class="badge badge-secure">Secure</span>
+                        </div>
+                        <div class="storage-option-desc">
+                            Encrypted with your password. Enter password once
+                            per browser session to unlock.
+                        </div>
+                    </div>
+                </label>
+
+                <div class="password-field" id="passwordField">
+                    <input
+                        type="password"
+                        id="encryptionPassword"
+                        placeholder="Enter encryption password" />
+                    <p class="password-hint">
+                        This password encrypts your API key. Remember it!
+                    </p>
+                </div>
+            </div>
         </div>
 
         <div class="form-group">
@@ -190,6 +470,18 @@
         <button class="btn btn-primary" id="saveBtn">Save Settings</button>
 
         <div class="status" id="status"></div>
+
+        <div class="disclaimer">
+            <p>
+                Not affiliated with Google LLC.
+                <a
+                    href="https://kmab5.github.io/ask-gemini/#privacy"
+                    target="_blank"
+                    rel="noopener"
+                    >Privacy Policy</a
+                >
+            </p>
+        </div>
 
         <script src="popup.js"></script>
     </body>

@@ -202,18 +202,31 @@
         const contentEl = tooltipContainer.querySelector(".ask-gemini-content");
 
         try {
-            // Get settings from storage
+            // Get settings
             const settings = await new Promise((resolve) => {
                 chrome.storage.sync.get(
-                    ["geminiApiKey", "questionTemplate"],
+                    ["questionTemplate", "storageMode"],
                     resolve
                 );
             });
 
-            if (!settings.geminiApiKey) {
+            // Get API key from background script (handles both sync and encrypted modes)
+            const apiKeyResponse = await chrome.runtime.sendMessage({
+                action: "getApiKey",
+            });
+
+            const apiKey = apiKeyResponse?.apiKey;
+            const mode = settings.storageMode || "sync";
+
+            if (!apiKey) {
+                const message =
+                    mode === "encrypted"
+                        ? "Please unlock your API key in the extension settings (click the extension icon)."
+                        : "Please set your Gemini API key in the extension settings.";
+
                 contentEl.innerHTML = `
                     <div class="ask-gemini-error">
-                        <p>Please set your Gemini API key in the extension settings.</p>
+                        <p>${message}</p>
                         <p class="ask-gemini-hint">Click the extension icon in your toolbar to configure.</p>
                     </div>
                 `;
@@ -227,7 +240,7 @@
             // Send message to background script
             const response = await chrome.runtime.sendMessage({
                 action: "askGemini",
-                apiKey: settings.geminiApiKey,
+                apiKey: apiKey,
                 question: question,
             });
 

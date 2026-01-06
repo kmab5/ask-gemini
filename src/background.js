@@ -10,7 +10,34 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             .catch((error) => sendResponse({ error: error.message }));
         return true; // Keep message channel open for async response
     }
+
+    if (request.action === "getApiKey") {
+        getApiKey()
+            .then((apiKey) => sendResponse({ apiKey }))
+            .catch((error) => sendResponse({ error: error.message }));
+        return true;
+    }
 });
+
+// Get API key based on storage mode
+async function getApiKey() {
+    const syncData = await chrome.storage.sync.get([
+        "geminiApiKey",
+        "storageMode",
+        "encryptedApiKey",
+    ]);
+    const mode = syncData.storageMode || "sync";
+
+    if (mode === "sync") {
+        return syncData.geminiApiKey;
+    } else if (mode === "encrypted" || mode === "session") {
+        // Get from session storage
+        const sessionData = await chrome.storage.session.get(["sessionApiKey"]);
+        return sessionData.sessionApiKey;
+    }
+
+    return null;
+}
 
 async function handleGeminiRequest(apiKey, question) {
     try {

@@ -970,7 +970,26 @@
       handleGeminiRequest(request.apiKey, request.question).then(sendResponse).catch((error) => sendResponse({ error: error.message }));
       return true;
     }
+    if (request.action === "getApiKey") {
+      getApiKey().then((apiKey) => sendResponse({ apiKey })).catch((error) => sendResponse({ error: error.message }));
+      return true;
+    }
   });
+  async function getApiKey() {
+    const syncData = await chrome.storage.sync.get([
+      "geminiApiKey",
+      "storageMode",
+      "encryptedApiKey"
+    ]);
+    const mode = syncData.storageMode || "sync";
+    if (mode === "sync") {
+      return syncData.geminiApiKey;
+    } else if (mode === "encrypted" || mode === "session") {
+      const sessionData = await chrome.storage.session.get(["sessionApiKey"]);
+      return sessionData.sessionApiKey;
+    }
+    return null;
+  }
   async function handleGeminiRequest(apiKey, question) {
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
