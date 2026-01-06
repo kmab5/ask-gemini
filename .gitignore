@@ -1,4 +1,7 @@
-# Sensetive
+# Release
+release/
+
+# Sensitive
 *.pem
 
 # Prettier
