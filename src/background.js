@@ -6,22 +6,22 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // Default model
 const DEFAULT_MODEL = "gemini-2.5-flash-lite";
 
-// Curated list of major Gemini models (static to avoid API rate limits)
+// Curated list of major Gemini/Gemma models (static to avoid API rate limits)
 const AVAILABLE_MODELS = [
     {
-        id: "gemini-latest-pro",
+        id: "gemini-pro-latest",
         name: "Gemini Pro Latest",
-        description: "Latest pro model",
+        description: "Latest release of Gemini Pro",
     },
     {
-        id: "gemini-3-flash-preview",
-        name: "Gemini 3 Flash",
-        description: "Most balanced model, designed to scale",
+        id: "gemini-flash-latest",
+        name: "Gemini Flash Latest",
+        description: "Latest release of Gemini Flash",
     },
     {
-        id: "gemini-2.5-flash-lite",
-        name: "Gemini 2.5 Flash Lite",
-        description: "Latest, fastest and most efficient",
+        id: "gemini-flash-lite-latest",
+        name: "Gemini Flash Lite Latest",
+        description: "Latest release of Gemini Flash-Lite",
     },
     {
         id: "gemini-3-pro-preview",
@@ -36,17 +36,17 @@ const AVAILABLE_MODELS = [
     {
         id: "gemini-2.5-flash-lite",
         name: "Gemini 2.5 Flash Lite",
-        description: "Latest, fastest and most efficient",
+        description: "Fastest and most efficient (default)",
     },
     {
         id: "gemini-2.5-flash",
         name: "Gemini 2.5 Flash",
-        description: "Latest fast model",
+        description: "Fast and capable",
     },
     {
         id: "gemini-2.5-pro",
         name: "Gemini 2.5 Pro",
-        description: "Latest, most capable",
+        description: "Most capable Gemini model",
     },
     {
         id: "gemini-2.0-flash-lite",
@@ -56,7 +56,7 @@ const AVAILABLE_MODELS = [
     {
         id: "gemini-2.0-flash",
         name: "Gemini 2.0 Flash",
-        description: "Fast and capable",
+        description: "Balanced performance",
     },
     {
         id: "gemma-3-27b-it",

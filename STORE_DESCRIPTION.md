@@ -1,9 +1,11 @@
 # Chrome Web Store Listing
 
 ## Extension Name
+
 Ask Gemini
 
 ## Short Description (132 characters max)
+
 Highlight any text on the web and get instant AI-powered explanations from Google's Gemini. Fast, private, and customizable.
 
 ## Detailed Description
@@ -21,7 +23,7 @@ Get AI explanations in under 2 seconds. Powered by Google's latest Gemini models
 Highlight text → Click the floating button → Get your answer. It's that simple.
 
 **🤖 Choose Your Model**
-Select from available Gemini models including Flash and Pro variants. Models are automatically fetched when you open settings.
+Select from available Gemini and Gemma models including Flash Lite, Flash, Pro, and open-source Gemma variants. Refresh models anytime to get the latest options.
 
 **⚙️ Fully Customizable**
 Set your own question templates:
@@ -70,21 +72,26 @@ Under 50KB total. Only activates when you select text.
 
 ### 🔗 Links
 
-• Privacy Policy: https://kmab5.github.io/ask-gemini/#privacy
-• Source Code: https://github.com/kmab5/ask-gemini
-• Report Issues: https://github.com/kmab5/ask-gemini/issues
+- Website: <https://kmab5.github.io/ask-gemini/>
+- Privacy Policy: <https://kmab5.github.io/ask-gemini/#privacy>
+- Getting Started: <https://kmab5.github.io/ask-gemini/#getting-started>
+- Source Code: <https://github.com/kmab5/ask-gemini>
+- Report Issues: <https://github.com/kmab5/ask-gemini/issues>
 
 ---
 
-**Note:** Ask Gemini is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Google LLC. Gemini is a trademark of Google LLC.
+**Note:** Ask Gemini is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Google LLC. Gemini and Gemma are trademarks of Google LLC.
 
 ## Category
+
 Productivity
 
 ## Language
+
 English
 
 ## Screenshots Suggestions
+
 1. Highlighting text with the floating Gemini button visible
 2. Tooltip showing an AI explanation
 3. Settings popup with API key and model selection

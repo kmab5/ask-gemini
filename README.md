@@ -1,10 +1,13 @@
 # Ask Gemini - Chrome Extension
 
-[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://github.com/kmab5/ask-gemini)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/kmab5/ask-gemini)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Author](https://img.shields.io/badge/author-kmab5-orange.svg)](https://github.com/kmab5)
+[![Website](https://img.shields.io/badge/website-ask--gemini-4285f4.svg)](https://kmab5.github.io/ask-gemini/)
 
 A Chrome extension that lets you quickly find out what highlighted text means by asking Google's Gemini AI.
+
+🌐 **Website:** [kmab5.github.io/ask-gemini](https://kmab5.github.io/ask-gemini/)
 
 ![Ask Gemini](icons/logox128.png)
 
@@ -12,7 +15,9 @@ A Chrome extension that lets you quickly find out what highlighted text means by
 
 - **Quick Access**: Highlight any text on a webpage to see a floating Gemini button
 - **Instant Answers**: Click the button to get AI-powered explanations
+- **Model Selection**: Choose from Gemini and Gemma models (Flash, Pro, and open-source variants)
 - **Customizable Questions**: Set your own question template (e.g., "What is {highlightedtext}?" or "Translate {highlightedtext} to Spanish")
+- **Secure Storage**: Optional password-protected encryption (AES-256-GCM) for your API key
 - **Clean UI**: Modern, dark-themed tooltip with smooth animations
 - **Ghost Loading**: Beautiful shimmer animation while waiting for responses
 - **Concise Responses**: Gemini is configured to give direct answers under 100 words with no embellishments
@@ -170,6 +175,18 @@ Contributions are welcome! Feel free to:
 Issues and PRs can be submitted at [github.com/kmab5/ask-gemini](https://github.com/kmab5/ask-gemini)
 
 ## Changelog
+
+### v1.2.0
+
+- **Model Selection**: Choose from multiple Gemini and Gemma models
+- **Model Refresh**: Fetch latest available models from Google's API
+- **Getting Started Guide**: New section on landing page for new users
+- **Rate Limit Guidance**: Helpful error messages when rate limited
+- **Gemma Support**: Added Gemma 3 models (27B, 12B, 4B, 1B)
+- **Website Launch**: Official landing page at [kmab5.github.io/ask-gemini](https://kmab5.github.io/ask-gemini/)
+- Model list cached in local storage for persistence
+- Shows selected model name in tooltip header after response
+- Chrome Web Store listing description added
 
 ### v1.1.1
 
